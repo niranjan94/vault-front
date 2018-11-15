@@ -6,7 +6,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     session: {
-      email: null,
+      username: null,
       token: null
     }
   },
@@ -16,11 +16,11 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    loginUser({ commit }, { email, token }) {
-      commit('setSession', { email, token });
+    loginUser({ commit }, { username, token }) {
+      commit('setSession', { username, token });
     },
     logoutUser({ commit }) {
-      commit('setSession', { email: null, token: null });
+      commit('setSession', { username: null, token: null });
     }
   },
 });

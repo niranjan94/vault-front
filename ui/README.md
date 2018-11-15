@@ -1,4 +1,4 @@
-# pii-vault-ui
+# vault-front
 
 ### Project setup
 ```

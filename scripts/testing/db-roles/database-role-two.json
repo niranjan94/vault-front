@@ -1,0 +1,11 @@
+{
+  "creation_statements": [
+    "CREATE USER \"{{name}}\" PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; GRANT api TO \"{{name}}\";"
+  ],
+  "db_name": "staging-master",
+  "default_ttl": 1800,
+  "max_ttl": 0,
+  "renew_statements": null,
+  "revocation_statements": null,
+  "rollback_statements": null
+}

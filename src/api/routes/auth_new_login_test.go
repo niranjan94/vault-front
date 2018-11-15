@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/niranjan94/vault-front/src/models"
-	"github.com/niranjan94/vault-front/src/utils"
 	testingUtils "github.com/niranjan94/vault-front/src/utils/testing"
 	"github.com/niranjan94/vault-front/src/vault"
 	assertLib "github.com/stretchr/testify/assert"
@@ -16,7 +15,7 @@ func TestNewUserLogin(t *testing.T)  {
 	assert := assertLib.New(t)
 	// Correct username password (Without 2FA)
 	_, rec, c := testingUtils.NewPostRequestWithBody(LoginRequest{
-		Email: newTestUser.Email,
+		Username: newTestUser.Username,
 		Password: newTestUser.Password,
 	})
 
@@ -30,7 +29,7 @@ func TestNewUserLogin(t *testing.T)  {
 
 	// Incorrect username+password (First time)
 	_, rec, c = testingUtils.NewPostRequestWithBody(LoginRequest{
-		Email: "i.do.not.know.who.i.am@lost.me",
+		Username: "i.do.not.know.who.i.am",
 		Password: "wrong_password",
 	})
 
@@ -39,7 +38,7 @@ func TestNewUserLogin(t *testing.T)  {
 
 	// Incorrect password (First time)
 	_, rec, c = testingUtils.NewPostRequestWithBody(LoginRequest{
-		Email: newTestUser.Email,
+		Username: newTestUser.Username,
 		Password: "wrong_password",
 	})
 
@@ -47,20 +46,20 @@ func TestNewUserLogin(t *testing.T)  {
 	assert.Equal(http.StatusUnauthorized, rec.Code, "Check incorrect password (w/o 2FA)")
 
 	_, rec, c = testingUtils.NewPostRequestWithBody(LoginRequest{
-		Email: newTestUser.Email,
+		Username: newTestUser.Username,
 		Password: newTestUser.Password,
 	})
 
 	// Correct username password (2FA Enabled)
-	totpPath := fmt.Sprintf("totp/code/%s", utils.SHA512(newTestUser.Email))
+	totpPath := fmt.Sprintf("totp/code/%s", newTestUser.Username)
 	otp, err := vault.GetManagerClient().Logical().Read(totpPath)
 	if err != nil {
 		panic(err)
 	}
 	_, rec, c = testingUtils.NewPostRequestWithBody(LoginRequest{
-		Email: newTestUser.Email,
+		Username: newTestUser.Username,
 		Password: newTestUser.Password,
-		OTP: otp.Data["code"].(string),
+		OTP:      otp.Data["code"].(string),
 	})
 
 	assert.NoError(Login()(c))
@@ -81,10 +80,10 @@ func TestNewUserLogin(t *testing.T)  {
 	newPassword := "Zxyzzy1234#New"
 
 	_, rec, c = testingUtils.NewPostRequestWithBody(LoginRequest{
-		Email: newTestUser.Email,
-		Password: newTestUser.Password,
+		Username:    newTestUser.Username,
+		Password:    newTestUser.Password,
 		NewPassword: newPassword,
-		OTP: otp.Data["code"].(string),
+		OTP:         otp.Data["code"].(string),
 	})
 
 	assert.NoError(Login()(c))
@@ -99,9 +98,9 @@ func TestNewUserLogin(t *testing.T)  {
 
 	// Correct username password (With 2FA)
 	_, rec, c = testingUtils.NewPostRequestWithBody(LoginRequest{
-		Email: newTestUser.Email,
+		Username: newTestUser.Username,
 		Password: newPassword,
-		OTP: otp.Data["code"].(string),
+		OTP:      otp.Data["code"].(string),
 	})
 
 	assert.NoError(Login()(c))
@@ -112,7 +111,7 @@ func TestNewUserLogin(t *testing.T)  {
 	assert.NotEmpty(response.Token, "Check if user is able to login and get token")
 
 	// Expire user password
-	user := models.NewUser(newTestUser.Email)
+	user := models.NewUser(newTestUser.Username)
 	metadata := user.GetMetadata()
 	expiredDate :=  metadata.PasswordChangedAt.AddDate(0, -2, 0)
 	metadata.PasswordChangedAt = &expiredDate
@@ -126,9 +125,9 @@ func TestNewUserLogin(t *testing.T)  {
 		panic(err)
 	}
 	_, rec, c = testingUtils.NewPostRequestWithBody(LoginRequest{
-		Email: newTestUser.Email,
+		Username: newTestUser.Username,
 		Password: newPassword,
-		OTP: otp.Data["code"].(string),
+		OTP:      otp.Data["code"].(string),
 	})
 
 	assert.NoError(Login()(c))

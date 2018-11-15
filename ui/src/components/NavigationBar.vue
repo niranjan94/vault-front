@@ -1,11 +1,11 @@
 <template>
   <div class="ui inverted menu">
     <div class="header item">
-      PII Vault
+      Vault Front
     </div>
     <router-link class="item" to="/" active-class="active">Dashboard</router-link>
     <div class="right menu">
-      <sui-dropdown :item="true" :text="authenticatedUser.email">
+      <sui-dropdown :item="true" :text="authenticatedUser.username">
         <sui-dropdown-menu>
           <sui-dropdown-item v-on:click.prevent="logout">Logout</sui-dropdown-item>
         </sui-dropdown-menu>

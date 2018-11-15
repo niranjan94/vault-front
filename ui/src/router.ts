@@ -1,6 +1,5 @@
 import VueRouter from 'vue-router';
 import LoginForm from './components/LoginForm.vue';
-import RegistrationForm from './components/RegistrationForm.vue';
 import IndexView from './components/IndexView.vue';
 import NotFound from './components/NotFound.vue';
 import store from './store';
@@ -18,7 +17,6 @@ const authGuard = (to, from, next) => {
 const routes = [
   { path: '/', component: IndexView, beforeEnter: authGuard },
   { path: '/login', component: LoginForm },
-  { path: '/register', component: RegistrationForm },
   { path: '*', component: NotFound, beforeEnter: authGuard }
 ];
 

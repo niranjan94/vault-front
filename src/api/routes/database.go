@@ -14,6 +14,13 @@ type CredentialRequest struct {
 	Role string `json:"role"`
 }
 
+type CredentialResponse struct {
+	Username      string `json:"username"`
+	Password      string `json:"password"`
+	ConnectionUrl string `json:"connectionUrl"`
+	Validity      int    `json:"validity"`
+}
+
 func GetAllowedDatabases() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		manager := vault.GetManagerClient()
@@ -41,7 +48,7 @@ func GetAllowedDatabases() echo.HandlerFunc {
 			perms := v.([]interface{})
 			if perms[0].(string) != "deny" {
 				splitPath := strings.Split(k, "/")
-				allowedRoles = append(allowedRoles, splitPath[len(splitPath) - 1])
+				allowedRoles = append(allowedRoles, splitPath[len(splitPath)-1])
 			}
 		}
 
@@ -62,6 +69,7 @@ func GetCredential() echo.HandlerFunc {
 			return err
 		}
 
+		manager := vault.GetManagerClient()
 		client := vault.GetClientFromContext(c)
 		credentials, err := client.Logical().Read(
 			fmt.Sprintf("database/creds/%s", credentialRequest.Role),
@@ -76,7 +84,37 @@ func GetCredential() echo.HandlerFunc {
 			return utils.WriteStatus(c, http.StatusInternalServerError)
 		}
 
+		roleInfo, err := manager.Logical().Read(
+			fmt.Sprintf("database/roles/%s", credentialRequest.Role),
+		)
 
-		return c.JSON(http.StatusOK, credentials.Data)
+		if err != nil {
+			log.Println(err.Error())
+			return utils.WriteStatus(c, http.StatusInternalServerError)
+		}
+
+		databaseInfo, err := manager.Logical().Read(
+			fmt.Sprintf("database/config/%s", roleInfo.Data["db_name"]),
+		)
+
+		if err != nil {
+			log.Println(err.Error())
+			return utils.WriteStatus(c, http.StatusInternalServerError)
+		}
+
+		connectionUrl := databaseInfo.Data["connection_details"].(map[string]interface{})["connection_url"].(string)
+
+		response := CredentialResponse{
+			Username: credentials.Data["username"].(string),
+			Password: credentials.Data["password"].(string),
+			Validity: credentials.LeaseDuration,
+		}
+
+		connectionUrl = strings.Replace(connectionUrl, "{{username}}", response.Username, 1)
+		connectionUrl = strings.Replace(connectionUrl, "{{password}}", response.Password, 1)
+
+		response.ConnectionUrl = connectionUrl
+
+		return c.JSON(http.StatusOK, response)
 	}
 }

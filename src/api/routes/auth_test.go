@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/labstack/echo"
 	"github.com/niranjan94/vault-front/src/api/auth"
-	"github.com/niranjan94/vault-front/src/utils"
 	testingUtils "github.com/niranjan94/vault-front/src/utils/testing"
 	"github.com/niranjan94/vault-front/src/vault"
 	assertLib "github.com/stretchr/testify/assert"
@@ -17,15 +16,15 @@ func TestLogin(t *testing.T) {
 	assert := assertLib.New(t)
 
 	// Correct username password (2FA Enabled)
-	totpPath := fmt.Sprintf("totp/code/%s", utils.SHA512(twoFactorTestUser.Email))
+	totpPath := fmt.Sprintf("totp/code/%s", twoFactorTestUser.Username)
 	otp, err := vault.GetManagerClient().Logical().Read(totpPath)
 	if err != nil {
 		panic(err)
 	}
 	_, rec, c := testingUtils.NewPostRequestWithBody(LoginRequest{
-		Email: twoFactorTestUser.Email,
+		Username: twoFactorTestUser.Username,
 		Password: twoFactorTestUser.Password,
-		OTP: otp.Data["code"].(string),
+		OTP:      otp.Data["code"].(string),
 	})
 
 	assert.NoError(Login()(c))
@@ -39,15 +38,15 @@ func TestLogin(t *testing.T) {
 
 	// Incorrect password (2FA Enabled)
 	// Correct username password (2FA Enabled)
-	totpPath = fmt.Sprintf("totp/code/%s", utils.SHA512(twoFactorTestUser.Email))
+	totpPath = fmt.Sprintf("totp/code/%s", twoFactorTestUser.Username)
 	otp, err = vault.GetManagerClient().Logical().Read(totpPath)
 	if err != nil {
 		panic(err)
 	}
 	_, rec, c = testingUtils.NewPostRequestWithBody(LoginRequest{
-		Email: twoFactorTestUser.Email,
+		Username: twoFactorTestUser.Username,
 		Password: "wrong_password",
-		OTP: otp.Data["code"].(string),
+		OTP:      otp.Data["code"].(string),
 	})
 
 	assert.NoError(Login()(c))
@@ -55,9 +54,9 @@ func TestLogin(t *testing.T) {
 
 	// Incorrect OTP (2FA Enabled)
 	_, rec, c = testingUtils.NewPostRequestWithBody(LoginRequest{
-		Email: twoFactorTestUser.Email,
+		Username: twoFactorTestUser.Username,
 		Password: twoFactorTestUser.Password,
-		OTP: "000000",
+		OTP:      "000000",
 	})
 
 	assert.NoError(Login()(c))
@@ -65,9 +64,9 @@ func TestLogin(t *testing.T) {
 
 	// Incorrect OTP (2FA Enabled)
 	_, rec, c = testingUtils.NewPostRequestWithBody(LoginRequest{
-		Email: twoFactorTestUser.Email,
+		Username: twoFactorTestUser.Username,
 		Password: twoFactorTestUser.Password,
-		OTP: "000000",
+		OTP:      "000000",
 	})
 
 	assert.NoError(Login()(c))
@@ -75,7 +74,7 @@ func TestLogin(t *testing.T) {
 
 	// Missing OTP (2FA Enabled)
 	_, rec, c = testingUtils.NewPostRequestWithBody(LoginRequest{
-		Email: twoFactorTestUser.Email,
+		Username: twoFactorTestUser.Username,
 		Password: twoFactorTestUser.Password,
 	})
 
@@ -84,9 +83,9 @@ func TestLogin(t *testing.T) {
 
 	// Incorrect OTP+Password (2FA Enabled)
 	_, rec, c = testingUtils.NewPostRequestWithBody(LoginRequest{
-		Email: twoFactorTestUser.Email,
+		Username: twoFactorTestUser.Username,
 		Password: "wrong_password",
-		OTP: "000000",
+		OTP:      "000000",
 	})
 
 	assert.NoError(Login()(c))
@@ -94,9 +93,9 @@ func TestLogin(t *testing.T) {
 
 	// Incorrect Username+OTP+Password (2FA Enabled)
 	_, rec, c = testingUtils.NewPostRequestWithBody(LoginRequest{
-		Email: "i.do.not.know.who.i.am@lost.me",
+		Username: "i.do.not.know.who.i.am",
 		Password: "wrong_password",
-		OTP: "000000",
+		OTP:      "000000",
 	})
 
 	assert.NoError(Login()(c))
@@ -110,15 +109,15 @@ func TestLogout(t *testing.T) {
 
 	// Correct username password (First time)
 
-	totpPath := fmt.Sprintf("totp/code/%s", utils.SHA512(twoFactorTestUser.Email))
+	totpPath := fmt.Sprintf("totp/code/%s", twoFactorTestUser.Username)
 	otp, err := vault.GetManagerClient().Logical().Read(totpPath)
 	if err != nil {
 		panic(err)
 	}
 	_, rec, c := testingUtils.NewPostRequestWithBody(LoginRequest{
-		Email: twoFactorTestUser.Email,
+		Username: twoFactorTestUser.Username,
 		Password: twoFactorTestUser.Password,
-		OTP: otp.Data["code"].(string),
+		OTP:      otp.Data["code"].(string),
 	})
 
 	assert.NoError(Login()(c))

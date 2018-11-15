@@ -1,21 +1,17 @@
 <template>
-  <div class="ui stackable grid">
-    <div class="ten wide column">
-      <WordCloud/>
-    </div>
-    <div class="six wide column">
-      <AccessControl/>
+  <div class="ui stackable centered grid">
+    <div class="eight wide column">
+      <database-credentials/>
     </div>
   </div>
 </template>
 
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
-  import WordCloud from './WordCloud.vue';
-  import AccessControl from './AccessControl.vue';
+  import DatabaseCredentials from './DatabaseCredentials.vue';
 
   @Component({
-    components: {AccessControl, WordCloud}
+    components: {DatabaseCredentials}
   })
   export default class IndexView extends Vue {
   }

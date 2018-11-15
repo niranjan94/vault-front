@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/niranjan94/vault-front/src/cmd"
 	"github.com/niranjan94/vault-front/src/models"
-	"github.com/niranjan94/vault-front/src/utils"
 	"github.com/niranjan94/vault-front/src/vault"
 	"time"
 )
@@ -25,15 +24,15 @@ func init()  {
 	restrictedToken = createAndLoginTestUser(false)
 	cmd.LoadConfigForTest()
 	twoFactorTestUser = &LoginRequest{
-		Email: "john.doe@vault.com",
+		Username: "john.doe",
 		Password: "Zxyzzy1234#",
 	}
 	plainTestUser = &LoginRequest{
-		Email: "jane.doe@vault.com",
+		Username: "jane.doe",
 		Password: "Zxyzzy1234#",
 	}
 	newTestUser = &LoginRequest{
-		Email: "new.jane.doe@vault.com",
+		Username: "new.jane.doe",
 		Password: "Zxyzzy1234#",
 	}
 	createTestUser(twoFactorTestUser, true, false, true)
@@ -47,13 +46,12 @@ func waitForNewOtp()  {
 
 func createAndLoginTestUser(allDatabases bool) string {
 	primaryTestUser := &LoginRequest{
-		Email: fmt.Sprintf("%d-john.jane.doe@vault.com", time.Now().UnixNano()),
+		Username: fmt.Sprintf("%d-john.jane.doe", time.Now().UnixNano()),
 		Password: "Zxyzzy1234#",
 	}
 	createTestUser(primaryTestUser, true, false, allDatabases)
 	client := vault.GetManagerClient()
-	id := utils.SHA512(primaryTestUser.Email)
-	userpassPath := fmt.Sprintf("auth/userpass/login/%s", id)
+	userpassPath := fmt.Sprintf("auth/userpass/login/%s", primaryTestUser.Username)
 	data, err := client.Logical().Write(userpassPath, map[string]interface{}{
 		"password": primaryTestUser.Password,
 	})
@@ -66,16 +64,15 @@ func createAndLoginTestUser(allDatabases bool) string {
 
 func createTestUser(body *LoginRequest, withTwoFactor bool, isNew bool, allDatabases bool) {
 	client := vault.GetManagerClient()
-	email := utils.SHA512(body.Email)
 
-	userpassPath := fmt.Sprintf("auth/userpass/users/%s", email)
-	totpPath := fmt.Sprintf("totp/keys/%s", email)
+	userpassPath := fmt.Sprintf("auth/userpass/users/%s", body.Username)
+	totpPath := fmt.Sprintf("totp/keys/%s", body.Username)
 
 	if withTwoFactor {
 		_, err := client.Logical().Write(totpPath, map[string]interface{}{
 			"generate":     true,
 			"issuer":       "Vault Front",
-			"account_name": body.Email,
+			"account_name": body.Username,
 			"period"    : twoFactorPeriod,
 		})
 		if err != nil {
@@ -100,7 +97,7 @@ func createTestUser(body *LoginRequest, withTwoFactor bool, isNew bool, allDatab
 
 	now := time.Now()
 
-	user := models.NewUser(body.Email)
+	user := models.NewUser(body.Username)
 	metadata := user.GetMetadata()
 	metadata.IsNew = isNew
 	metadata.LastLoginAt = &now

@@ -10,11 +10,6 @@ import (
 	"testing"
 )
 
-type credentialResponse struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
 func TestGetAllowedDatabases(t *testing.T) {
 	assert := assertLib.New(t)
 	req, rec, c := testingUtils.NewGetRequest()
@@ -51,10 +46,12 @@ func TestGetCredential(t *testing.T)  {
 	assert.NoError(GetCredential()(c))
 	assert.Equal(http.StatusOK, rec.Code)
 
-	var credentialResponse credentialResponse
+	var credentialResponse CredentialResponse
 	assert.NoError(json.Unmarshal(rec.Body.Bytes(), &credentialResponse))
 	assert.Equal(credentialResponse.Username, "john-doe")
 	assert.Equal(credentialResponse.Password, "xyzzy1")
+	assert.Equal(credentialResponse.ConnectionUrl, "postgresql://john-doe:xyzzy1@rds-master.local:5432/")
+	assert.NotEmpty(credentialResponse.Validity)
 
 	req, rec, c = testingUtils.NewPostRequestWithBody(CredentialRequest{
 		Role: "database-role-two",

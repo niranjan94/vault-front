@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"github.com/labstack/echo"
 	"github.com/niranjan94/vault-front/src/models"
 	"github.com/niranjan94/vault-front/src/utils"
@@ -13,7 +14,7 @@ import (
 )
 
 type LoginRequest struct {
-	Email       string `json:"email"`
+	Username    string `json:"username"`
 	Password    string `json:"password"`
 	NewPassword string `json:"newPassword"`
 	OTP         string `json:"otp"`
@@ -51,13 +52,13 @@ func Login() echo.HandlerFunc {
 		}
 
 		body.OTP = strings.TrimSpace(body.OTP)
-		body.Email = strings.TrimSpace(body.Email)
+		body.Username = strings.TrimSpace(body.Username)
 
 		if !isPasswordValid(body.Password) {
 			return utils.WriteStatus(c, http.StatusUnauthorized)
 		}
 
-		user := models.NewUser(body.Email)
+		user := models.NewUser(body.Username)
 		token := user.Authenticate(body.Password)
 		if token == "" {
 			return utils.WriteStatus(c, http.StatusUnauthorized)

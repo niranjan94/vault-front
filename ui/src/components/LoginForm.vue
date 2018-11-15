@@ -6,115 +6,125 @@
           Log-in
         </div>
       </h2>
-      <form class="ui large form" id="login-form" autocomplete="off" v-on:submit.prevent="onSubmit">
-        <div class="ui segments">
-          <div class="ui segment">
-            <div class="field">
-              <div class="ui left icon input">
-                <i class="at icon"></i>
-                <input type="email"
-                       v-model.trim="email"
-                       name="email"
-                       placeholder="E-mail address"
-                       autocomplete="off"
-                       required>
-              </div>
-            </div>
-            <div class="field">
-              <div class="ui left icon input">
-                <i class="lock icon"></i>
-                <input type="password"
-                       v-model.trim="password"
-                       name="password"
-                       placeholder="Password"
-                       autocomplete="off"
-                       required>
-              </div>
-            </div>
-            <div class="field">
-              <div class="ui left icon input">
-                <i class="clock icon"></i>
-                <input type="password"
-                       v-model.trim="code"
-                       name="code"
-                       placeholder="2FA Code"
-                       maxlength="6"
-                       minlength="6"
-                       autocomplete="off">
-              </div>
-            </div>
-            <sui-button type="submit" :loading="isLoading" :fluid="true" size="large" :disabled="isLoading" color="black">
-              Login
-            </sui-button>
-          </div>
-          <div class="ui link secondary segment">
-            <router-link class="item" to="/register" active-class="active" data-test="register-button">Register</router-link>
-          </div>
-        </div>
-
-        <div class="ui error message"></div>
-      </form>
-
+      <div class="ui segment">
+        <credential-form :is-loading="isLoading" :on-complete="onSubmit" v-if="currentView === 'credential'"/>
+        <password-reset-form :is-loading="isLoading" :on-complete="onSubmit" v-if="currentView === 'password'"/>
+        <verification-form :url="otpUrl" :secret="otpSecret" :is-loading="isLoading" :on-complete="onSubmit" v-if="currentView === 'two-factor'"/>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-  import { Component, Vue } from 'vue-property-decorator';
-  import axios from 'axios';
+import { Component, Vue } from 'vue-property-decorator';
+import axios from 'axios';
+import CredentialForm from './login/CredentialForm.vue';
+import PasswordResetForm from './login/PasswordResetForm.vue';
+import VerificationForm from './login/VerificationForm.vue';
 
-  @Component({
-    components: {}
-  })
-  export default class LoginForm extends Vue {
+@Component({
+  components: {VerificationForm, PasswordResetForm, CredentialForm}
+})
+export default class LoginForm extends Vue {
 
-    private email: string = '';
-    private password: string = '';
-    private code: string = '';
+  private isLoading: boolean = false;
+  private currentView: string = 'credential';
+  private lastPayload: any;
 
-    private isLoading: boolean = false;
+  private otpUrl: string = '';
+  private otpSecret: string = '';
 
-    protected async onSubmit() {
-      if (this.isLoading) {
+  protected async onSubmit(payload: any) {
+    if (this.isLoading) {
+      return;
+    }
+    this.isLoading = true;
+    try {
+
+
+      if (!payload.password && !payload.username) {
+
+        if (payload.newPassword) {
+          payload.username = this.lastPayload.username;
+          payload.password = this.lastPayload.password;
+        }
+
+        if (payload.code) {
+          payload = {
+            username: this.lastPayload.username,
+            password: this.lastPayload.password,
+            otp: payload.code
+          };
+        }
+      }
+
+      this.lastPayload = payload;
+      const response = await axios.post('auth/session', payload);
+      this.isLoading = false;
+
+      if (response.status === 201) {
+        this.currentView = 'credential';
+        this.$notify({
+          title: 'Your password has been changed.',
+          type: 'success',
+          text: 'Login with your new password to continue.'
+        });
         return;
       }
-      this.isLoading = true;
-      try {
-        const response = await axios.post('auth/session', {
-          email: this.email,
-          password: this.password,
-          otp: this.code
-        });
 
+      if (response.data.token) {
         await this.$store.dispatch('loginUser', {
-          email: this.email,
+          username: payload.username,
           token: response.data.token
         });
-
+        this.currentView = '';
         this.$notify({
           title: 'You have been logged in.',
           type: 'success',
           text: 'As a security precaution, this session will not be stored by your browser and ' +
             'you will need to re-authenticate after the window is closed or refreshed.'
         });
-
         this.$router.push('/');
-
-      } catch (e) {
-        if (e.response.status === 401 || e.response.status === 409) {
-          this.$notify({ type: 'error',  text: 'The credentials entered are incorrect.' });
-        } else {
-          this.$notify({ type: 'error',  text: e.message });
-        }
+        return;
       }
 
-      this.password = '';
-      this.code = '';
+      if (response.data.secret) {
+        this.currentView = 'two-factor';
+        this.otpSecret = response.data.secret;
+        this.otpUrl = response.data.url;
+        return;
+      }
 
-      this.isLoading = false;
+      if (response.data.status === 'password_expired') {
+        this.$notify({
+          title: 'Your password has expired.',
+          type: 'warning',
+          text: 'Please set a new password to continue.'
+        });
+        this.currentView = 'password';
+        return;
+      }
+    } catch (e) {
+      const error = (() => {
+        if (this.currentView === 'two-factor' && e.response.status === 401) {
+          return 'The entered OTP is incorrect.';
+        } else {
+          if (e.response.status === 401) {
+            return 'The credentials entered are incorrect.';
+          }
+          if (e.response.status === 409) {
+            return 'Code already used; wait until the next time period';
+          }
+          return e.message;
+        }
+      })();
+
+      this.$notify({ type: 'error',  text: error });
     }
-  }
 
+    this.isLoading = false;
+  }
+}
 </script>
 
 <style scoped lang="scss">

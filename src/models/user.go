@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	"github.com/niranjan94/vault-front/src/utils"
 	"github.com/niranjan94/vault-front/src/vault"
 	"log"
 	"net/url"
@@ -10,8 +9,7 @@ import (
 )
 
 type User struct {
-	Id    string
-	Email string
+	Username string
 
 	userpassPath string
 	totpKeyPath  string
@@ -42,7 +40,7 @@ func (u *User) Authenticate(password string) (string) {
 }
 
 func (u *User) ChangePassword(token string, password string) error {
-	userpassPasswordPath := fmt.Sprintf("auth/userpass/users/%s/password", u.Id)
+	userpassPasswordPath := fmt.Sprintf("auth/userpass/users/%s/password", u.Username)
 	client := vault.GetManagerClient()
 	_, err := client.Logical().Write(userpassPasswordPath, map[string]interface{}{
 		"password": password,
@@ -94,7 +92,7 @@ func (u *User) SetupOTP(twoFactorPeriod int64) (*OtpInformation, error) {
 	otpInfo, err := client.Logical().Write(u.totpKeyPath, map[string]interface{}{
 		"generate":     true,
 		"issuer":       "Vault Front",
-		"account_name": u.Email,
+		"account_name": u.Username,
 		"period": 		twoFactorPeriod,
 	})
 
@@ -147,16 +145,13 @@ func (u *User) SetMetadata(metadata *UserMetadata) error {
 	return err
 }
 
-func NewUser(email string) *User {
-	id := utils.SHA512(email)
-
+func NewUser(username string) *User {
 	user := User{
-		Id:           id,
-		Email:        email,
-		metadataPath: fmt.Sprintf("kv/metadata/auth/userpass/%s", id),
-		userpassPath: fmt.Sprintf("auth/userpass/login/%s", id),
-		totpKeyPath:  fmt.Sprintf("totp/keys/%s", id),
-		totpCodePath: fmt.Sprintf("totp/code/%s", id),
+		Username:     username,
+		metadataPath: fmt.Sprintf("kv/metadata/auth/userpass/%s", username),
+		userpassPath: fmt.Sprintf("auth/userpass/login/%s", username),
+		totpKeyPath:  fmt.Sprintf("totp/keys/%s", username),
+		totpCodePath: fmt.Sprintf("totp/code/%s", username),
 	}
 
 	return &user

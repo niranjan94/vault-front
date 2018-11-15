@@ -41,7 +41,7 @@
       </div>
     </div>
     <sui-button type="submit" :loading="isLoading" :fluid="true" size="large" :disabled="isLoading" color="black">
-      Complete Registration
+      Verify OTP
     </sui-button>
   </form>
 </template>
@@ -51,7 +51,7 @@
   import QrCode from 'qrious';
 
   @Component({})
-  export default class RegistrationForm extends Vue {
+  export default class VerificationForm extends Vue {
 
     @Prop(String) private url!: string;
     @Prop(String) private secret!: string;
@@ -72,9 +72,10 @@
 
     protected onSubmit(e) {
       e.preventDefault();
-      this.onComplete(this.code);
+      this.onComplete({
+        code: this.code
+      });
     }
-
   }
 
 </script>

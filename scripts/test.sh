@@ -25,15 +25,22 @@ vault policy write manager vault/policies/vault-front.hcl;
 vault policy write test-user-policy scripts/testing/test-user-policy.hcl
 vault policy write test-user-policy-restricted scripts/testing/test-user-policy-restricted.hcl
 
+# Write dummy database configs to the database mount clone
+vault kv put database/config/development-master @scripts/testing/db-configs/development-master.json
+vault kv put database/config/testing-master @scripts/testing/db-configs/testing-master.json
+vault kv put database/config/staging-master @scripts/testing/db-configs/staging-master.json
+
 # Write dummy database credentials to the database mount clone
-vault kv put database/creds/database-role-one @scripts/testing/database-role-one.json
-vault kv put database/creds/database-role-two @scripts/testing/database-role-two.json
-vault kv put database/creds/database-role-three @scripts/testing/database-role-three.json
+vault kv put database/creds/database-role-one @scripts/testing/db-creds/database-role-one.json
+vault kv put database/creds/database-role-two @scripts/testing/db-creds/database-role-two.json
+vault kv put database/creds/database-role-three @scripts/testing/db-creds/database-role-three.json
+vault kv put database/creds/database-role-three @scripts/testing/db-creds/database-role-four.json
 
 # Write dummy database credentials to the database mount clone for creds listing purposes
-vault kv put database/roles/database-role-one @scripts/testing/database-role-one.json
-vault kv put database/roles/database-role-two @scripts/testing/database-role-two.json
-vault kv put database/roles/database-role-three @scripts/testing/database-role-three.json
+vault kv put database/roles/database-role-one @scripts/testing/db-roles/database-role-one.json
+vault kv put database/roles/database-role-two @scripts/testing/db-roles/database-role-two.json
+vault kv put database/roles/database-role-three @scripts/testing/db-roles/database-role-three.json
+vault kv put database/roles/database-role-three @scripts/testing/db-roles/database-role-four.json
 
 export PII_VAULT_TOKEN=$(vault token create -policy=manager -field=token);
 export PII_TEST_VAULT_TOKEN=$(vault token create -policy=manager -field=token);

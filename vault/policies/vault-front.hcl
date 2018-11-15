@@ -25,3 +25,11 @@ path "auth/token/lookup-accessor" {
 path "database/roles" {
   capabilities = ["list"]
 }
+
+path "database/config/*" {
+  capabilities = ["read"]
+}
+
+path "database/roles/*" {
+  capabilities = ["read"]
+}

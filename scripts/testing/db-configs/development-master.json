@@ -1,0 +1,11 @@
+{
+  "allowed_roles": [
+    "database-role-one"
+  ],
+  "connection_details": {
+    "connection_url": "postgresql://{{username}}:{{password}}@rds-master.local:5432/",
+    "username": "admin"
+  },
+  "plugin_name": "postgresql-database-plugin",
+  "root_credentials_rotate_statements": []
+}
