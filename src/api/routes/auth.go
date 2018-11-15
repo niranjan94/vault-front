@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"github.com/labstack/echo"
 	"github.com/niranjan94/vault-front/src/models"
 	"github.com/niranjan94/vault-front/src/utils"

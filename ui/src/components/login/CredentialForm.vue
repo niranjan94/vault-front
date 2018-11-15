@@ -1,5 +1,5 @@
 <template>
-  <form class="ui large form" id="login-form" autocomplete="off" v-on:submit.prevent="onSubmit">
+  <form class="ui large form" id="credential-form" autocomplete="off" v-on:submit.prevent="onSubmit">
     <div class="field">
       <div class="ui left icon input">
         <i class="user icon"></i>

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/GeertJohan/go.rice"
 	"github.com/niranjan94/vault-front/src/cmd"
+	testingUtils "github.com/niranjan94/vault-front/src/utils/testing"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -19,7 +20,7 @@ func TestStartApiServer(t *testing.T) {
 		false,
 	)
 	assert.NotEmpty(t, e)
-	// testingUtils.RunUIE2E(t)
+	testingUtils.RunUIE2E(t)
 	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
 	defer cancel()
 	if err := e.Shutdown(ctx); err != nil {
