@@ -3,6 +3,8 @@
 trap "exit 0" INT TERM
 trap "kill 0" EXIT
 
+export PATH=$PATH:$(pwd)/.dev
+
 echo "Starting vault server in dev mode..."
 vault server -dev > /dev/null 2>&1 &
 

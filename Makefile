@@ -13,7 +13,7 @@ all: test build
 build:
 	cd ui && yarn build && cd ..
 	rice embed-go
-	$(GOBUILD) -o $(BINARY_NAME) -v
+	$(GOBUILD) -o $(BINARY_NAME) -v -ldflags="-s -w"
 
 test:
 	sh scripts/test.sh
@@ -32,9 +32,10 @@ dev:
 
 deps:
 	curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-	$(GOGET) github.com/oxequa/realize -v
-	$(GOGET) github.com/GeertJohan/go.rice/rice -v
+	$(GOGET) -v github.com/oxequa/realize
+	$(GOGET) -v github.com/GeertJohan/go.rice/rice
 	dep ensure -v
 	mkdir -p .dev
 	curl https://releases.hashicorp.com/vault/0.11.4/vault_0.11.4_linux_amd64.zip -o .dev/vault.zip
 	unzip -d .dev .dev/vault.zip && rm -f .dev/vault.zip
+	cd ui && yarn && yarn build

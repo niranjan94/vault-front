@@ -39,4 +39,4 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw*
-pii-vault
+vault-front

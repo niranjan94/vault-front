@@ -1,0 +1,30 @@
+settings:
+  files:
+    outputs:
+      status: false
+    logs:
+      status: false
+    errors:
+      status: false
+  legacy:
+    force: false
+    interval: 0s
+schema:
+- name: vault-front
+  path: .
+  commands:
+    install:
+      status: true
+    run:
+      status: true
+  watcher:
+    extensions:
+    - go
+    paths:
+    - /
+    ignored_paths:
+    - .git
+    - .realize
+    - .dev
+    - vendor
+    - ui
