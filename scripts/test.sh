@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-trap "exit 0" INT TERM
-trap "kill 0" EXIT
+if [[ -z "$1" ]]; then
+    trap "exit" INT TERM
+    trap "kill 0 && exit" EXIT
+fi
 
 export PATH=$PATH:$(pwd)/.dev
 
@@ -48,5 +50,5 @@ export PII_VAULT_TOKEN=$(vault token create -policy=manager -field=token);
 export PII_TEST_VAULT_TOKEN=$(vault token create -policy=manager -field=token);
 
 echo "Running tests..."
+
 go test -coverprofile=coverage.out -v ./...
-go tool cover -html=coverage.out

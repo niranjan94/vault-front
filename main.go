@@ -13,9 +13,11 @@ import (
 )
 
 var config string
+var showVersion bool
 
 func init() {
 	flag.StringVar(&config, "config", "", "Path to config.hcl")
+	flag.BoolVar(&showVersion, "version", false, "Show version")
 	flag.Parse()
 }
 
@@ -31,7 +33,18 @@ sudo setcap cap_ipc_lock=+ep $(readlink -f $(which vault-front))
 To disable mlock entirely, set disableMLock to "true" in config file
 `
 
+var (
+	version = "dev"
+	commit  = "unknown"
+)
+
 func main() {
+
+	if showVersion {
+		fmt.Printf("Version: %v\nCommit: %v\n", version, commit)
+		return
+	}
+
 	err := cmd.LoadConfig(config)
 
 	if err != nil {
