@@ -21,7 +21,7 @@ RUN yarn build
 FROM golang:alpine as server
 
 RUN apk update && \
-    apk add curl git file && \
+    apk add curl git file ca-certificates && \
     curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 WORKDIR /go/src/github.com/niranjan94/vault-front/
@@ -50,6 +50,7 @@ FROM scratch
 WORKDIR /app
 
 COPY --from=server /go/src/github.com/niranjan94/vault-front/vault-front /app
+COPY --from=server /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 EXPOSE 8000
 
