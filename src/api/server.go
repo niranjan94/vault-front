@@ -58,14 +58,19 @@ func StartApiServer(box *rice.HTTPBox, withGracefulExit bool) *echo.Echo {
 		}
 	})
 
-	if useSsl {
-		e.Use(middleware.SecureWithConfig(middleware.SecureConfig{
-			XSSProtection:         "1; mode=block",
-			ContentTypeNosniff:    "nosniff",
-			XFrameOptions:         "SAMEORIGIN",
-			ContentSecurityPolicy: "default-src 'self' blob: https://api.github.com;",
-		}))
-	}
+	e.Use(middleware.SecureWithConfig(middleware.SecureConfig{
+		XSSProtection:         "1; mode=block",
+		ContentTypeNosniff:    "nosniff",
+		XFrameOptions:         "SAMEORIGIN",
+		ContentSecurityPolicy: "" +
+			"default-src 'self' ; " +
+			"script-src 'self' ; " +
+			"style-src 'self' data: 'unsafe-inline' https://fonts.googleapis.com; " +
+			"img-src 'self' data: ; " +
+			"font-src 'self' data: https://fonts.googleapis.com https://fonts.gstatic.com; " +
+			"frame-src 'none' ; " +
+			"frame-ancestors 'none' ;",
+	}))
 
 	assetHandler := http.FileServer(box)
 	e.GET("/*", echo.WrapHandler(assetHandler))
