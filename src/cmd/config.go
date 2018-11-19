@@ -79,6 +79,7 @@ func LoadConfig(pathToConfig string) error {
 	viper.SetDefault("api.listenAddress", "0.0.0.0:8000")
 	viper.SetDefault("api.ssl.enabled", false)
 	viper.SetDefault("vault.address", "http://127.0.0.1:8200")
+	viper.SetDefault("vault.instanceMetadataService", "http://169.254.169.254")
 	viper.SetDefault("disableMLock", false)
 
 	return nil

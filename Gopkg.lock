@@ -147,6 +147,12 @@
   version = "v1.8.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/matryer/resync"
+  packages = ["."]
+  revision = "d39c09a11215c84aab0b65e323fc47dd6e276af1"
+
+[[projects]]
   name = "github.com/mattn/go-colorable"
   packages = ["."]
   revision = "167de6bfdfba052fa6b2d3664c8f5272e23c9072"
@@ -311,6 +317,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "db35322b5412ec8a680931f6f2670d8f568dac7b3921d7321cb193a1873d8174"
+  inputs-digest = "b7171dcd43ff83d9799fbb135d6e7b6eccc0ee97476542743507e29231ebbf65"
   solver-name = "gps-cdcl"
   solver-version = 1

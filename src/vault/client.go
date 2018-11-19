@@ -1,8 +1,6 @@
 package vault
 
 import (
-	"bytes"
-	"context"
 	"github.com/hashicorp/vault/api"
 	"github.com/labstack/echo"
 	"github.com/spf13/viper"
@@ -43,14 +41,11 @@ func GetTokenFromRequest(r *http.Request) string  {
 
 func ValidateToken(token string) (bool)  {
 	vaultClient := GetClient(token)
-	request := vaultClient.NewRequest("POST", "/v1/sys/tools/random")
-	response, err := vaultClient.RawRequestWithContext(context.Background(), request)
+	self, err := vaultClient.Auth().Token().LookupSelf()
 	if err != nil {
 		return false
 	}
-	buf := new(bytes.Buffer)
-	_, err = buf.ReadFrom(response.Body)
-	if err != nil {
+	if self.Data == nil {
 		return false
 	}
 	return true
@@ -58,8 +53,7 @@ func ValidateToken(token string) (bool)  {
 
 func InvalidateToken(token string) (error)  {
 	client := GetClient(token)
-	request := client.NewRequest("POST", "/v1/auth/token/revoke-self")
-	_, err := client.RawRequestWithContext(context.Background(), request)
+	err := client.Auth().Token().RevokeSelf(token)
 	if err != nil {
 		log.Println(err.Error())
 		return err
