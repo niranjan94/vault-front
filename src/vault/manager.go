@@ -45,7 +45,7 @@ func authenticateViaEC2() (*api.Secret, error) {
 
 func GetManagerClient() (*api.Client) {
 	once.Do(func() {
-		token := viper.GetString("vault.token");
+		token := viper.GetString("vault.token")
 		switch viper.GetString("vault.authMode") {
 		case "ec2":
 			{

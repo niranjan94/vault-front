@@ -29,6 +29,7 @@ type config struct {
 	Vault struct {
 		Address  string `json:"address"`
 		AuthMode string `json:"authMode"`
+		AuthRole string `json:"authRole"`
 		Token    string `json:"token"`
 	} `json:"vault"`
 }
