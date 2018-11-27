@@ -27,10 +27,11 @@ type config struct {
 	DisableMLock bool `json:"disableMLock"`
 
 	Vault struct {
-		Address  string `json:"address"`
-		AuthMode string `json:"authMode"`
-		AuthRole string `json:"authRole"`
-		Token    string `json:"token"`
+		Address   string `json:"address"`
+		AuthMode  string `json:"authMode"`
+		AuthRole  string `json:"authRole"`
+		AuthNonce string `json:"authNonce"`
+		Token     string `json:"token"`
 	} `json:"vault"`
 }
 
