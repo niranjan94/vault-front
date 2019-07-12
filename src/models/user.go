@@ -28,7 +28,7 @@ type OtpInformation struct {
 	Secret string `json:"secret"`
 }
 
-func (u *User) Authenticate(password string) (string) {
+func (u *User) Authenticate(password string) string {
 	client := vault.GetManagerClient()
 	data, err := client.Logical().Write(u.userpassPath, map[string]interface{}{
 		"password": password,

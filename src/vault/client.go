@@ -39,7 +39,7 @@ func GetTokenFromRequest(r *http.Request) string  {
 	return token[len("Bearer") + 1:]
 }
 
-func ValidateToken(token string) (bool)  {
+func ValidateToken(token string) bool {
 	vaultClient := GetClient(token)
 	self, err := vaultClient.Auth().Token().LookupSelf()
 	if err != nil {
@@ -51,7 +51,7 @@ func ValidateToken(token string) (bool)  {
 	return true
 }
 
-func InvalidateToken(token string) (error)  {
+func InvalidateToken(token string) error {
 	client := GetClient(token)
 	err := client.Auth().Token().RevokeSelf(token)
 	if err != nil {

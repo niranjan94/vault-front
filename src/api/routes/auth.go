@@ -24,7 +24,7 @@ type LoginResponse struct {
 	Status string `json:"status,omitempty"`
 }
 
-func isPasswordValid(s string) (bool) {
+func isPasswordValid(s string) bool {
 	number := false
 	upper := false
 	special := false
