@@ -8,6 +8,9 @@ before_install:
   - nvm use 10
   - make deps
 
+env:
+  - GO111MODULE=on
+
 script:
 - bash scripts/test.sh ci_mode
 - make build

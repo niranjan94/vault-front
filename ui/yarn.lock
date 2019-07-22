@@ -1017,10 +1017,10 @@
     webpack ">=4 < 4.29"
     yorkie "^2.0.0"
 
-"@vue/cli-service@^3.9.2":
-  version "3.9.2"
-  resolved "https://registry.yarnpkg.com/@vue/cli-service/-/cli-service-3.9.2.tgz#59c95500f1f20ab1cd1905c28f6c3b17c04d6de8"
-  integrity sha512-R4L9tCMpJ4DzLgu/aU9CEtl5QYsj/FXRrtEgXSKm+71OVtA/o2rkLTC8SLB2Bu7wHP/HCYbaoy4NZqSEQzTuLw==
+"@vue/cli-service@^3.9.3":
+  version "3.9.3"
+  resolved "https://registry.yarnpkg.com/@vue/cli-service/-/cli-service-3.9.3.tgz#4bd5786465afb8b608c5c7fc9661390e747ea756"
+  integrity sha512-CZE9PP4HH9bK4qAaLbTUB3tubggI+aRSbgB/QYSZrVlhtMpuVFZPj2QHbIvJQZTI2cG6LFQtLTZWXKeqo5lbAQ==
   dependencies:
     "@intervolga/optimize-cssnano-plugin" "^1.0.5"
     "@soda/friendly-errors-webpack-plugin" "^1.7.1"
@@ -1055,7 +1055,7 @@
     hash-sum "^1.0.2"
     html-webpack-plugin "^3.2.0"
     launch-editor-middleware "^2.2.1"
-    lodash.defaultsdeep "^4.6.0"
+    lodash.defaultsdeep "^4.6.1"
     lodash.mapvalues "^4.6.0"
     lodash.transform "^4.6.0"
     mini-css-extract-plugin "^0.6.0"
@@ -4636,10 +4636,10 @@ https-proxy-agent@1:
     debug "2"
     extend "3"
 
-humanize-duration@^3.19.0:
-  version "3.19.0"
-  resolved "https://registry.yarnpkg.com/humanize-duration/-/humanize-duration-3.19.0.tgz#e91b1dd19e1dc35a9d4c07285281bc8e2eb6a92f"
-  integrity sha512-ZLkXjRTucGKkIB9KAz6s0+sLqVRgqsH+equEx99H12P3syU79begnGXtkfK0HfT7RKnu4GehGfo14WyrPyZAUA==
+humanize-duration@^3.20.0:
+  version "3.20.0"
+  resolved "https://registry.yarnpkg.com/humanize-duration/-/humanize-duration-3.20.0.tgz#88b92122ffa59b15436706dc6fe51e37309826d7"
+  integrity sha512-4w6Y+EqikmF3KDdOTOIi8xl1kCJcnB9mu304aB224ZwCxDm/qeqzh/aYHEfpLFxo0HMVur5ibNlel/VPdN+2Jw==
 
 iconv-lite@0.4.23:
   version "0.4.23"
@@ -5648,10 +5648,10 @@ lodash.defaultsdeep@4.3.2:
     lodash.mergewith "^4.0.0"
     lodash.rest "^4.0.0"
 
-lodash.defaultsdeep@^4.6.0:
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/lodash.defaultsdeep/-/lodash.defaultsdeep-4.6.0.tgz#bec1024f85b1bd96cbea405b23c14ad6443a6f81"
-  integrity sha1-vsECT4WxvZbL6kBbI8FK1kQ6b4E=
+lodash.defaultsdeep@^4.6.1:
+  version "4.6.1"
+  resolved "https://registry.yarnpkg.com/lodash.defaultsdeep/-/lodash.defaultsdeep-4.6.1.tgz#512e9bd721d272d94e3d3a63653fa17516741ca6"
+  integrity sha512-3j8wdDzYuWO3lM3Reg03MuQR957t287Rpcxp1njpEa8oDrikb+FwGdW3n+FELh/A6qib6yPit0j/pv9G/yeAqA==
 
 lodash.isarguments@^3.0.0:
   version "3.1.0"
