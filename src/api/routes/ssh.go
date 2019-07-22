@@ -11,6 +11,7 @@ import (
 )
 
 type SigningRequest struct {
+	Username  string `json:"username"`
 	Role      string `json:"role"`
 	PublicKey string `json:"publicKey"`
 }
@@ -77,11 +78,18 @@ func GetSignedCertificate() echo.HandlerFunc {
 
 		manager := vault.GetManagerClient()
 		client := vault.GetClientFromContext(c)
+
+		requestPayload := map[string]interface{}{
+			"public_key": strings.TrimSpace(signingRequest.PublicKey),
+		}
+
+		if signingRequest.Username != "" {
+			requestPayload["valid_principals"] = signingRequest.Username
+		}
+
 		credentials, err := client.Logical().Write(
 			fmt.Sprintf("ssh-client-signer/sign/%s", signingRequest.Role),
-			map[string]interface{}{
-				"public_key": strings.TrimSpace(signingRequest.PublicKey),
-			},
+			requestPayload,
 		)
 
 		if err != nil {
@@ -103,7 +111,7 @@ func GetSignedCertificate() echo.HandlerFunc {
 		}
 
 		response := SigningResponse{
-			Username:  roleInfo.Data["default_user"].(string),
+			Username:  requestPayload["valid_principals"].(string),
 			Name:      signingRequest.Role,
 			Validity:  roleInfo.Data["ttl"],
 			SignedKey: credentials.Data["signed_key"].(string),
