@@ -18,6 +18,7 @@ type SigningRequest struct {
 type SigningResponse struct {
 	Username  string      `json:"username"`
 	Name      string      `json:"name"`
+	Serial    string      `json:"serial"`
 	Validity  interface{} `json:"validity"`
 	SignedKey string      `json:"signedKey"`
 }
@@ -106,6 +107,7 @@ func GetSignedCertificate() echo.HandlerFunc {
 			Name:      signingRequest.Role,
 			Validity:  roleInfo.Data["ttl"],
 			SignedKey: credentials.Data["signed_key"].(string),
+			Serial:    credentials.Data["serial_number"].(string),
 		}
 
 		return c.JSON(http.StatusOK, response)

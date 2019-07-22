@@ -3,8 +3,8 @@
     <h4 class="ui top attached header">
       Database Credentials
     </h4>
-    <div class="ui attached segment" :class="{ loading: isLoading }">
-      <form class="ui small form" v-on:submit.prevent="getCredentials">
+    <div class="ui attached segment" :class="{ loading: isLoading }" v-if="databases.length > 0">
+      <form class="ui small form" v-if="databases.length > 0" v-on:submit.prevent="getCredentials">
         <div class="field">
           <sui-dropdown
             fluid
@@ -20,6 +20,9 @@
           </button>
         </div>
       </form>
+    </div>
+    <div class="ui attached secondary segment" v-if="databases.length === 0">
+      <p>You do not have permissions to access any databases.</p>
     </div>
     <div class="ui attached segment" v-if="credentials">
       <table class="ui selectable very basic very compact small table">
