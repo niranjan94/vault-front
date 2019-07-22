@@ -3,17 +3,21 @@
     <h4 class="ui top attached header">
       SSH Key Signing
     </h4>
-    <div class="ui attached segment" :class="{ loading: isLoading }" v-if="instances.length > 0">
+    <div class="ui attached segment" :class="{ loading: isLoading }" v-if="roles.length > 0">
       <form class="ui small form" v-on:submit.prevent="getCredentials">
         <div class="field">
-          <label>Instance</label>
+          <label>Role</label>
           <sui-dropdown
             fluid
-            :options="instances"
-            placeholder="Select Instance"
+            :options="roles"
+            placeholder="Select Role"
             search
             selection
             v-model="selectedRole"/>
+        </div>
+        <div class="field">
+          <label>Username</label>
+          <input type="text" name="username" placeholder="Username" v-model="username" required>
         </div>
         <div class="field">
           <label>OpenSSH-compatible Public Key to sign</label>
@@ -26,7 +30,7 @@
         </div>
       </form>
     </div>
-    <div class="ui attached secondary segment" v-if="instances.length === 0">
+    <div class="ui attached secondary segment" v-if="roles.length === 0">
       <p>You do not have permissions to access any instances.</p>
     </div>
 
@@ -79,18 +83,19 @@ import { saveAs } from 'file-saver';
 @Component({})
 export default class SshSigning extends Vue {
 
-  protected instances: any[] = [];
+  protected roles: any[] = [];
 
   private isLoading: boolean = true;
   private selectedRole: any = null;
   private credentials: any = null;
-  private publicKey: any = '';
+  private publicKey: string = '';
+  private username: string = '';
 
   protected async created() {
     this.isLoading = true;
     try {
       const response = await axios.get('ssh');
-      this.instances = response.data.map((role) => ({ key: role, value: role, text: role }));
+      this.roles = response.data.map((role) => ({ key: role, value: role, text: role }));
     } catch (e) {
       this.$notify({ type: 'error', text: e.message });
     }
@@ -113,7 +118,8 @@ export default class SshSigning extends Vue {
     try {
       const response = await axios.post('ssh/sign', {
         role: this.selectedRole,
-        publicKey: this.publicKey
+        publicKey: this.publicKey,
+        username: this.username,
       });
       this.credentials = response.data;
       this.credentials.validity = humanizeDuration(this.credentials.validity * 1000);
@@ -126,7 +132,7 @@ export default class SshSigning extends Vue {
       }
       fileName = `${fileName}.pub`;
       this.credentials.fileName = fileName;
-      this.credentials.usage = `ssh -i ${fileName} -i <path-to-private-key> ${this.credentials.username}@<hostname>`;
+      this.credentials.usage = `ssh -i ${fileName} -i <path-to-private-key> ${this.username}@<hostname>`;
 
     } catch (e) {
       this.$notify({ type: 'error', text: e.message });
