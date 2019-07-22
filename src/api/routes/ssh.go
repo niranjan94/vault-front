@@ -16,9 +16,10 @@ type SigningRequest struct {
 }
 
 type SigningResponse struct {
-	Username string `json:"username"`
-	Name     string `json:"name"`
-	Validity int    `json:"validity"`
+	Username  string      `json:"username"`
+	Name      string      `json:"name"`
+	Validity  interface{} `json:"validity"`
+	SignedKey string      `json:"signedKey"`
 }
 
 func GetAllowedInstances() echo.HandlerFunc {
@@ -32,10 +33,12 @@ func GetAllowedInstances() echo.HandlerFunc {
 			return utils.WriteStatus(c, http.StatusInternalServerError)
 		}
 
+		var allRoles []string
 		var signerPaths []string
 
 		for _, role := range response.Data["keys"].([]interface{}) {
 			signerPaths = append(signerPaths, fmt.Sprintf("ssh-client-signer/sign/%s", role))
+			allRoles = append(allRoles, fmt.Sprintf("%s", role))
 		}
 
 		allowedSignerPathsRaw, err := client.Logical().Write("sys/capabilities-self", map[string]interface{}{
@@ -52,7 +55,10 @@ func GetAllowedInstances() echo.HandlerFunc {
 			perms := v.([]interface{})
 			if perms[0].(string) != "deny" {
 				splitPath := strings.Split(k, "/")
-				allowedSignerPaths = append(allowedSignerPaths, splitPath[len(splitPath)-1])
+				allowedRole := splitPath[len(splitPath)-1]
+				if utils.StringSliceContains(allRoles, allowedRole) {
+					allowedSignerPaths = append(allowedSignerPaths, allowedRole)
+				}
 			}
 		}
 
@@ -96,9 +102,10 @@ func GetSignedCertificate() echo.HandlerFunc {
 		}
 
 		response := SigningResponse{
-			Username: roleInfo.Data["default_user"].(string),
-			Name:     signingRequest.Role,
-			Validity: credentials.LeaseDuration,
+			Username:  roleInfo.Data["default_user"].(string),
+			Name:      signingRequest.Role,
+			Validity:  roleInfo.Data["ttl"],
+			SignedKey: credentials.Data["signed_key"].(string),
 		}
 
 		return c.JSON(http.StatusOK, response)
