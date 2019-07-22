@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func GetBaseClient() (*api.Client)  {
+func GetBaseClient() *api.Client {
 	vaultClient, err := api.NewClient(&api.Config{
 		Address: viper.GetString("vault.address"),
 	})
@@ -18,7 +18,7 @@ func GetBaseClient() (*api.Client)  {
 	return vaultClient
 }
 
-func GetClient(token string) (*api.Client) {
+func GetClient(token string) *api.Client {
 	vaultClient := GetBaseClient()
 	if token != "" {
 		vaultClient.SetToken(token)
@@ -26,11 +26,11 @@ func GetClient(token string) (*api.Client) {
 	return vaultClient
 }
 
-func GetClientFromContext(c echo.Context) (*api.Client) {
+func GetClientFromContext(c echo.Context) *api.Client {
 	return GetClientFromRequest(c.Request())
 }
 
-func GetClientFromRequest(r *http.Request) (*api.Client) {
+func GetClientFromRequest(r *http.Request) *api.Client {
 	return GetClient(GetTokenFromRequest(r))
 }
 

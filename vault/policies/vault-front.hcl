@@ -26,10 +26,18 @@ path "database/roles" {
   capabilities = ["list"]
 }
 
+path "ssh-client-signer/roles" {
+  capabilities = ["list"]
+}
+
 path "database/config/*" {
   capabilities = ["read"]
 }
 
 path "database/roles/*" {
+  capabilities = ["read"]
+}
+
+path "ssh-client-signer/roles/*" {
   capabilities = ["read"]
 }

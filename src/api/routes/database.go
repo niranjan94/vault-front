@@ -41,6 +41,10 @@ func GetAllowedDatabases() echo.HandlerFunc {
 		allowedRolesRaw, err := client.Logical().Write("sys/capabilities-self", map[string]interface{}{
 			"paths": databaseRolePaths,
 		})
+		if err != nil {
+			log.Println(err.Error())
+			return utils.WriteStatus(c, http.StatusInternalServerError)
+		}
 
 		var allowedRoles []string
 
@@ -50,11 +54,6 @@ func GetAllowedDatabases() echo.HandlerFunc {
 				splitPath := strings.Split(k, "/")
 				allowedRoles = append(allowedRoles, splitPath[len(splitPath)-1])
 			}
-		}
-
-		if err != nil {
-			log.Println(err.Error())
-			return utils.WriteStatus(c, http.StatusInternalServerError)
 		}
 
 		return c.JSON(http.StatusOK, allowedRoles)

@@ -85,6 +85,9 @@ func StartApiServer(box *rice.HTTPBox, withGracefulExit bool) *echo.Echo {
 	authenticated.GET("/databases", routes.GetAllowedDatabases())
 	authenticated.POST("/databases/credentials", routes.GetCredential())
 
+	authenticated.GET("/ssh", routes.GetAllowedInstances())
+	authenticated.POST("/ssh/sign", routes.GetSignedCertificate())
+
 	authenticated.DELETE("/auth/session", routes.Logout())
 
 	// Start server
