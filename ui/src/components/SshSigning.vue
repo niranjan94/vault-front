@@ -120,13 +120,13 @@ export default class SshSigning extends Vue {
       this.credentials.fileName = '';
       let fileName = 'signed-cert';
       if (this.credentials.serial && this.credentials.serial !== '') {
-        fileName += `-${this.credentials.serial}`
+        fileName += `-${this.credentials.serial}`;
       } else {
-        fileName += `-${Math.floor(Date.now() / 1000)}`
+        fileName += `-${Math.floor(Date.now() / 1000)}`;
       }
       fileName = `${fileName}.pub`;
       this.credentials.fileName = fileName;
-      this.credentials.usage = `ssh -i ${fileName} -i <path-to-private-key> ${this.credentials.username}@<hostname>`
+      this.credentials.usage = `ssh -i ${fileName} -i <path-to-private-key> ${this.credentials.username}@<hostname>`;
 
     } catch (e) {
       this.$notify({ type: 'error', text: e.message });
@@ -139,31 +139,24 @@ export default class SshSigning extends Vue {
     saveAs(blob, this.credentials.fileName);
   }
 
-  private readFile(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = function() {
-        resolve({
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          content: this.result
-        });
-      };
-      reader.onerror = reject;
-      reader.readAsBinaryString(file);
-    })
-  }
-
   protected async onPublicKeySelect(e) {
     const files = e.target.files || e.dataTransfer.files;
     if (!files.length) {
       return;
     }
-    const file = await this.readFile(files[0]);
-    this.publicKey = file.content;
+    this.publicKey = await this.readFileAsString(files[0]);
   }
 
+  private readFileAsString(file): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = function() {
+        resolve(this.result as string);
+      };
+      reader.onerror = reject;
+      reader.readAsBinaryString(file);
+    });
+  }
 }
 </script>
 
