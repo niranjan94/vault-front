@@ -21,16 +21,17 @@ RUN yarn build
 FROM golang:alpine as server
 
 RUN apk update && \
-    apk add curl git file ca-certificates && \
-    curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+    apk add curl git file ca-certificates
 
-WORKDIR /go/src/github.com/niranjan94/vault-front/
+ENV GO111MODULE=on
+
+WORKDIR /build
 
 RUN go get -v github.com/GeertJohan/go.rice/rice
 
-COPY Gopkg.lock Gopkg.toml ./
+COPY go.mod go.sum ./
 
-RUN dep ensure -v -vendor-only
+RUN go mod download
 
 COPY src src
 COPY main.go .
@@ -49,7 +50,7 @@ FROM scratch
 
 WORKDIR /app
 
-COPY --from=server /go/src/github.com/niranjan94/vault-front/vault-front /app
+COPY --from=server /build/vault-front /app
 COPY --from=server /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 EXPOSE 8000
