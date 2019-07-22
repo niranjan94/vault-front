@@ -28,10 +28,10 @@ dev:
 	./$(BINARY_NAME)
 
 deps:
-	$(GOGET) -v github.com/oxequa/realize
-	$(GOGET) -v github.com/GeertJohan/go.rice/rice
 	go mod download
 	mkdir -p .dev
 	curl https://releases.hashicorp.com/vault/0.11.4/vault_0.11.4_linux_amd64.zip -o .dev/vault.zip
 	unzip -d .dev .dev/vault.zip && rm -f .dev/vault.zip
 	cd ui && yarn && yarn build
+	cd $(GOPATH) && $(GOGET) -v github.com/oxequa/realize && $(GOGET) -v github.com/GeertJohan/go.rice/rice
+
