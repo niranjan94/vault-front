@@ -28,3 +28,7 @@ config.hcl
 .dev
 rice-box.go
 vault-front
+ui/dist
+ui/.idea
+ui/node_modules
+dist
