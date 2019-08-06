@@ -56,6 +56,10 @@ func GetAllowedDatabases() echo.HandlerFunc {
 			}
 		}
 
+		if allowedRoles == nil {
+			allowedRoles = []string{}
+		}
+
 		return c.JSON(http.StatusOK, allowedRoles)
 	}
 }

@@ -95,7 +95,7 @@ export default class SshSigning extends Vue {
     this.isLoading = true;
     try {
       const response = await axios.get('ssh');
-      this.roles = response.data.map((role) => ({ key: role, value: role, text: role }));
+      this.roles = response.data.map((role) => ({ key: role, value: role, text: role.split(':').join(' - ') }));
     } catch (e) {
       this.$notify({ type: 'error', text: e.message });
     }

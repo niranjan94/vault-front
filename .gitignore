@@ -40,3 +40,4 @@ yavault-frontrn-error.log*
 *.sln
 *.sw*
 vault-front
+deploy\.sh

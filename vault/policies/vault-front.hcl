@@ -26,15 +26,15 @@ path "database/roles" {
   capabilities = ["list"]
 }
 
+path "ssh-development/roles" {
+  capabilities = ["list"]
+}
+
+path "ssh-production/roles" {
+  capabilities = ["list"]
+}
+
 path "ssh-ts/roles" {
-  capabilities = ["list"]
-}
-
-path "ssh-ts/production" {
-  capabilities = ["list"]
-}
-
-path "ssh-ts/development" {
   capabilities = ["list"]
 }
 

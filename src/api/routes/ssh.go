@@ -8,6 +8,7 @@ import (
 	"github.com/niranjan94/vault-front/src/vault"
 	"log"
 	"net/http"
+	"path"
 	"strings"
 )
 
@@ -38,25 +39,33 @@ func getAllowedRolesFromAllMounts(manager *api.Client, client *api.Client) ([]st
 		if mount.Type != "ssh" {
 			continue
 		}
-		response, err := manager.Logical().List(fmt.Sprintf("%s/roles", mountName))
+
+		response, err := manager.Logical().List(path.Join(mountName, "roles"))
 		if err != nil {
 			return nil, err
 		}
+
 		for _, role := range response.Data["keys"].([]interface{}) {
-			signerPaths = append(signerPaths, fmt.Sprintf("%s/sign/%s", mountName, role))
-			allRoles = append(allRoles, fmt.Sprintf("%s", role))
+			if val, ok := role.(string); ok {
+				signerPaths = append(signerPaths, fmt.Sprintf(path.Join(mountName, "sign", val)))
+				allRoles = append(allRoles, val)
+			}
 		}
 	}
 
 	allowedSignerPathsRaw, err := client.Logical().Write("sys/capabilities-self", map[string]interface{}{
 		"paths": signerPaths,
 	})
+
 	if err != nil {
 		return nil, err
 	}
 
 	var allowedSignerPaths []string
 	for k, v := range allowedSignerPathsRaw.Data {
+		if k == "capabilities" {
+			continue
+		}
 		perms := v.([]interface{})
 		if perms[0].(string) != "deny" {
 			splitPath := strings.Split(k, "/")
@@ -76,10 +85,16 @@ func GetAllowedInstances() echo.HandlerFunc {
 		manager := vault.GetManagerClient()
 		client := vault.GetClientFromContext(c)
 		allowedSignerPaths, err := getAllowedRolesFromAllMounts(manager, client)
+
 		if err != nil {
 			log.Println(err.Error())
 			return utils.WriteStatus(c, http.StatusInternalServerError)
 		}
+
+		if allowedSignerPaths == nil {
+			allowedSignerPaths = []string{}
+		}
+
 		return c.JSON(http.StatusOK, allowedSignerPaths)
 	}
 }
@@ -109,7 +124,7 @@ func GetSignedCertificate() echo.HandlerFunc {
 		}
 
 		credentials, err := client.Logical().Write(
-			fmt.Sprintf("%s/sign/%s", requestRoleRaw[0], requestRoleRaw[1]),
+			path.Join(requestRoleRaw[0], "sign", requestRoleRaw[1]),
 			requestPayload,
 		)
 
@@ -123,7 +138,7 @@ func GetSignedCertificate() echo.HandlerFunc {
 		}
 
 		roleInfo, err := manager.Logical().Read(
-			fmt.Sprintf("ssh-client-signer/roles/%s", signingRequest.Role),
+			path.Join(requestRoleRaw[0], "roles", requestRoleRaw[1]),
 		)
 
 		if err != nil {
