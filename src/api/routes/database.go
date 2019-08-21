@@ -10,11 +10,11 @@ import (
 	"strings"
 )
 
-type CredentialRequest struct {
+type databaseCredentialRequest struct {
 	Role string `json:"role"`
 }
 
-type CredentialResponse struct {
+type databaseCredentialResponse struct {
 	Username      string `json:"username"`
 	Password      string `json:"password"`
 	ConnectionUrl string `json:"connectionUrl"`
@@ -64,10 +64,10 @@ func GetAllowedDatabases() echo.HandlerFunc {
 	}
 }
 
-func GetCredential() echo.HandlerFunc {
+func GetDatabaseCredential() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		var credentialRequest CredentialRequest
+		var credentialRequest databaseCredentialRequest
 		if err := c.Bind(&credentialRequest); err != nil {
 			return err
 		}
@@ -107,7 +107,7 @@ func GetCredential() echo.HandlerFunc {
 
 		connectionUrl := databaseInfo.Data["connection_details"].(map[string]interface{})["connection_url"].(string)
 
-		response := CredentialResponse{
+		response := databaseCredentialResponse{
 			Username: credentials.Data["username"].(string),
 			Password: credentials.Data["password"].(string),
 			Validity: credentials.LeaseDuration,

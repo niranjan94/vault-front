@@ -12,13 +12,13 @@ import (
 	"strings"
 )
 
-type SigningRequest struct {
+type sshSigningRequest struct {
 	Username  string `json:"username"`
 	Role      string `json:"role"`
 	PublicKey string `json:"publicKey"`
 }
 
-type SigningResponse struct {
+type sshSigningResponse struct {
 	Username  string      `json:"username"`
 	Name      string      `json:"name"`
 	Serial    string      `json:"serial"`
@@ -102,7 +102,7 @@ func GetAllowedInstances() echo.HandlerFunc {
 func GetSignedCertificate() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		var signingRequest SigningRequest
+		var signingRequest sshSigningRequest
 		if err := c.Bind(&signingRequest); err != nil {
 			return err
 		}
@@ -146,7 +146,7 @@ func GetSignedCertificate() echo.HandlerFunc {
 			return utils.WriteStatus(c, http.StatusInternalServerError)
 		}
 
-		response := SigningResponse{
+		response := sshSigningResponse{
 			Username:  requestPayload["valid_principals"].(string),
 			Name:      signingRequest.Role,
 			Validity:  roleInfo.Data["ttl"],

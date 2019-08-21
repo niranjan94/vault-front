@@ -39,24 +39,24 @@ func TestGetAllowedDatabases(t *testing.T) {
 
 func TestGetCredential(t *testing.T)  {
 	assert := assertLib.New(t)
-	req, rec, c := testingUtils.NewPostRequestWithBody(CredentialRequest{
+	req, rec, c := testingUtils.NewPostRequestWithBody(databaseCredentialRequest{
 		Role: "database-role-one",
 	})
 	req.Header.Set(echo.HeaderAuthorization, "Bearer " + token)
-	assert.NoError(GetCredential()(c))
+	assert.NoError(GetDatabaseCredential()(c))
 	assert.Equal(http.StatusOK, rec.Code)
 
-	var credentialResponse CredentialResponse
+	var credentialResponse databaseCredentialResponse
 	assert.NoError(json.Unmarshal(rec.Body.Bytes(), &credentialResponse))
 	assert.Equal(credentialResponse.Username, "john-doe")
 	assert.Equal(credentialResponse.Password, "xyzzy1")
 	assert.Equal(credentialResponse.ConnectionUrl, "postgresql://john-doe:xyzzy1@rds-master.local:5432/")
 	assert.NotEmpty(credentialResponse.Validity)
 
-	req, rec, c = testingUtils.NewPostRequestWithBody(CredentialRequest{
+	req, rec, c = testingUtils.NewPostRequestWithBody(databaseCredentialRequest{
 		Role: "database-role-two",
 	})
 	req.Header.Set(echo.HeaderAuthorization, "Bearer " + restrictedToken)
-	assert.NoError(GetCredential()(c))
+	assert.NoError(GetDatabaseCredential()(c))
 	assert.Equal(http.StatusUnauthorized, rec.Code)
 }
