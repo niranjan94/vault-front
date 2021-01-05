@@ -11,7 +11,7 @@
     "test:e2e": "vue-cli-service test:e2e"
   },
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "es6-promise": "^4.2.8",
     "file-saver": "^2.0.2",
     "forest-themes-css": "^0.2.0",
