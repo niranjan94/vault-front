@@ -84,7 +84,7 @@ export default class LoginForm extends Vue {
           text: 'As a security precaution, this session will not be stored by your browser and ' +
             'you will need to re-authenticate after the window is closed or refreshed.'
         });
-        this.$router.push('/');
+        this.$router.push('/dashboard');
         return;
       }
 

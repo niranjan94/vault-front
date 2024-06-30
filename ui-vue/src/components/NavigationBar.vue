@@ -3,7 +3,8 @@
     <div class="header item">
       Vault Front
     </div>
-    <router-link class="item" to="/" active-class="active">Dashboard</router-link>
+    <router-link class="item" to="/dashboard" active-class="active">Dashboard</router-link>
+    <router-link class="item" to="/sftp" active-class="active">SFTP</router-link>
     <div class="right menu">
       <sui-dropdown :item="true" :text="authenticatedUser.username">
         <sui-dropdown-menu>
